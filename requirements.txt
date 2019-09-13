@@ -9,3 +9,4 @@ pillow
 scipy
 statistics; python_version<'3.4'
 cupy-cuda101
+chainerrl==0.7.0

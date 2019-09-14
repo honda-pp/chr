@@ -1,5 +1,5 @@
-#FROM nvidia/cuda:10.1-cudnn7-runtime-ubuntu16.04
-FROM ubuntu:16.04
+FROM nvidia/cuda:10.1-cudnn7-runtime-ubuntu16.04
+#FROM ubuntu:16.04
 
 RUN apt update && apt install -y build-essential libbz2-dev libdb-dev libreadline-dev libffi-dev libgdbm-dev \
 liblzma-dev libncursesw5-dev libsqlite3-dev libssl-dev  zlib1g-dev uuid-dev tk-dev wget unzip libglu1-mesa-dev \

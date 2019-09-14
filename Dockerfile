@@ -8,13 +8,12 @@ libgl1-mesa-dev libosmesa6-dev xvfb patchelf ffmpeg sudo
 RUN wget https://www.python.org/ftp/python/3.6.9/Python-3.6.9.tgz && tar xzf Python-3.6.9.tgz && rm Python-3.6.9.tgz
 RUN cd Python-3.6.9 && ./configure && make -j14 && make install 
 
-ENV USER hond
-ENV HOME /home/${USER}
-
 ADD ./requirements.txt ./requirements.txt
 RUN pip3 install -U setuptools pip\
 && pip3 install -r ./requirements.txt && rm ./requirements.txt
 
+ENV USER hond
+ENV HOME /home/${USER}
 RUN echo 'root:pass_r' |chpasswd
 RUN useradd -m ${USER} &&  gpasswd -a ${USER} sudo && echo "${USER}:pass_h" | chpasswd
 WORKDIR ${HOME}

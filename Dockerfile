@@ -1,5 +1,5 @@
-FROM nvidia/cuda:10.1-cudnn7-runtime-ubuntu16.04
-#FROM ubuntu:16.04
+#FROM nvidia/cuda:10.1-cudnn7-runtime-ubuntu16.04
+FROM ubuntu:16.04
 
 RUN apt update && apt install -y build-essential libbz2-dev libdb-dev libreadline-dev libffi-dev libgdbm-dev \
 liblzma-dev libncursesw5-dev libsqlite3-dev libssl-dev  zlib1g-dev uuid-dev tk-dev wget unzip libglu1-mesa-dev \
@@ -11,9 +11,9 @@ RUN cd Python-3.6.9 && ./configure && make -j14 && make install
 ENV USER hond
 ENV HOME /home/${USER}
 
-ADD ./requirements.txt ${HOME}/requirements.txt
-RUN pip3 install -U setuptools pip
-RUN pip3 install -r ${HOME}/requirements.txt
+ADD ./requirements.txt ./requirements.txt
+RUN pip3 install -U setuptools pip\
+&& pip3 install -r ./requirements.txt && rm ./requirements.txt
 
 RUN echo 'root:pass_r' |chpasswd
 RUN useradd -m ${USER} &&  gpasswd -a ${USER} sudo && echo "${USER}:pass_h" | chpasswd

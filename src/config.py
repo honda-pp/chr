@@ -38,7 +38,7 @@ def agp():
                         help='Random seed [0, 2 ** 32)')
     parser.add_argument('--outdir', type=str, default=None)
     parser.add_argument('--profile', action='store_true')
-    parser.add_argument('--steps', type=int, default=2 * 10 ** 4)
+    parser.add_argument('--steps', type=int, default=2 * 10 ** 5)
     parser.add_argument('--update-steps', type=int, default=5)
     parser.add_argument('--log-interval', type=int, default=400)
     parser.add_argument('--eval-interval', type=int, default=10 ** 3)

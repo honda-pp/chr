@@ -7,7 +7,7 @@ from functools import partial
 import chainerrl
 from chainerrl.agents import A2C
 class A2C_Vcheet(A2C):
-    def __init__(self, v_learn_length, max_episode_len, num_v_env, env_name, batch_size=32, seed=0, *args, **kwargs):
+    def __init__(self, v_learn_length, env_name, num_v_env, max_episode_len=None, batch_size=32, seed=0, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.v_learn_length = v_learn_length
         self.num_v_env = num_v_env

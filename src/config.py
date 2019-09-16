@@ -36,7 +36,7 @@ def agp():
     parser.add_argument('--env', type=str, default='CartPole-v0')
     parser.add_argument('--seed', type=int, default=0,
                         help='Random seed [0, 2 ** 32)')
-    parser.add_argument('--outdir', type=str, default=a)
+    parser.add_argument('--outdir', type=str, default=None)
     parser.add_argument('--profile', action='store_true')
     parser.add_argument('--steps', type=int, default=2 * 10 ** 4)
     parser.add_argument('--update-steps', type=int, default=5)

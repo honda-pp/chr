@@ -1,5 +1,5 @@
 from config import *
-
+from v_cheet import A2C_Vcheet
 def main():
 
     args = agp()
@@ -53,7 +53,7 @@ def main():
     if args.weight_decay > 0:
         optimizer.add_hook(NonbiasWeightDecay(args.weight_decay))
 
-    agent = a2c.A2C(model, optimizer, gamma=args.gamma,
+    agent = A2C_Vcheet(model, optimizer, gamma=args.gamma,
                     gpu=args.gpu,
                     num_processes=args.num_envs,
                     update_steps=args.update_steps,

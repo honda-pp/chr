@@ -17,7 +17,7 @@ class A2C_Vcheet(A2C):
         seeds = np.arange(num_v_env) + (seed + 1) * self.num_processes
         def make_env(env_name, i):
             env = gym.make(env_name)
-            env.seed(seeds[0])
+            env.seed(int(seeds[0]))
             return chainerrl.wrappers.CastObservationToFloat32(env)
         self.env = chainerrl.envs.MultiprocessVectorEnv(
             [partial(

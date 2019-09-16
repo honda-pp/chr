@@ -31,9 +31,8 @@ class A2C_Vcheet(A2C):
         #states = np.zeros(
         #    [self.v_learn_length + 1, self.num_v_env] + list(statevar.shape[1:]), dtype='f'
         #    )
-        
         states = np.zeros(
-            [self.v_learn_length + 1, self.num_v_env] + list(obss.shape[1:]), dtype='f'
+            [self.v_learn_length + 1, self.num_v_env] + list(obss[0].shape), dtype='f'
             )
         rewards = np.zeros(
             (self.v_learn_length, self.num_v_env), dtype='f'
@@ -109,11 +108,11 @@ class A2C_Vcheet(A2C):
             batch_states = states[batch_ind]
             batch_returns = returns[batch_ind]
             if chainer.cuda.available and self.xp is chainer.cuda.cupy:
-                batch_states = self.xp.to_gpu(batch_states)
-                batch_returns = self.xp.to_gpu(batch_returns)
+                batch_states = chainer.cuda.to_gpu(batch_states)
+                batch_returns = chainer.cuda.to_gpu(batch_returns)
             _, values = self.model.pi_and_v(batch_states)
             value_loss = F.mean((batch_returns - values) ** 2)
-            self.model.cleagrads()
+            self.model.cleargrads()
             value_loss.backward()
             self.optimizer.update()
 

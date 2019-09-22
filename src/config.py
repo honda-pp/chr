@@ -40,7 +40,7 @@ def agp():
     parser.add_argument('--profile', action='store_true')
     parser.add_argument('--steps', type=int, default=2 * 10 ** 5)
     parser.add_argument('--update-steps', type=int, default=5)
-    parser.add_argument('--log-interval', type=int, default=400)
+    parser.add_argument('--log-interval', type=int, default=10 ** 3)
     parser.add_argument('--eval-interval', type=int, default=10 ** 3)
     parser.add_argument('--eval-n-runs', type=int, default=14)
     parser.add_argument('--reward-scale-factor', type=float, default=1e-2)
@@ -64,5 +64,5 @@ def agp():
                         help='RMSprop optimizer alpha')
     parser.add_argument('--gpu', '-g', type=int, default=1,
                         help='GPU ID (negative value indicates CPU)')
-    parser.add_argument('--num-envs', type=int, default=14)
+    parser.add_argument('--num-envs', type=int, default=8)
     return  parser.parse_args()

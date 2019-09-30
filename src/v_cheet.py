@@ -118,7 +118,12 @@ class A2C_Vcheet(A2C):
 
 
 
+    """
     def batch_observe_and_train(self, batch_obs, batch_reward, batch_done, batch_reset):
         if self.t - self.t_start == self.update_steps:
             self.v_learn()
         return super().batch_observe_and_train(batch_obs, batch_reward, batch_done, batch_reset)
+    """
+    def update(self):
+        self.v_learn()
+        return self.update()

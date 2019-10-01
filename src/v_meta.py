@@ -20,26 +20,26 @@ class A2C_Vmeta(A2C):
         else:
             pass
 
-    def meta_batch_train(self, inds):
-        values = self.v_meta(Variable(self.states[inds].reshape([-1] + list(self.obs_shape))))
+    def meta_batch_train(self, inds, model):
+        values = model(Variable(self.states[inds].reshape([-1] + list(self.obs_shape))))
         loss = F.mean((self.returns[inds] - values) ** 2)
-        self.v_meta.cleargrads()
+        model.cleargrads()
         loss.backward()
-        for params in self.v_meta.params():
+        for params in model.params():
             params.data -= self.innerstepsize * params.grad
 
-    def meta_train(self):
+    def meta_train(self, model):
         mb_iter = chainer.iterators.SerialIterator(np.arange(self.states.shape[0]-1), self.meta_batch_size)
         for _ in range(self.innerepochs):
             while mb_iter.epoch == 0:
                 inds = mb_iter.__next__()
-                self.meta_batch_train(inds)
+                self.meta_batch_train(inds, model)
 
-    def meta_update(self):
-        before = deepcopy(self.v_meta)
-        self.meta_train()
-        for params_before, params in zip(before.params(), self.v_meta.params()):
-            params.data = params_before.data + self.outerstepsize * (params.data - params_before.data)
+    def meta_update(self, model=self.v_meta):
+        model_cp = deepcopy(model)
+        self.meta_train(model_cp)
+        for params_cp, params in zip(model_cp.params(), self.v_meta.params()):
+            params.data = params_cp.data + self.outerstepsize * (params.data - params_cp.data)
 
     def reset_params(self):
         for params, params_meta in zip(self.model.v.params(), self.v_meta.params()):

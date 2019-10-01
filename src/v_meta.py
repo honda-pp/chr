@@ -29,14 +29,17 @@ class A2C_Vmeta(A2C):
             params.data -= self.innerstepsize * params.grad
 
     def meta_train(self):
-        before = deepcopy(self.v_meta)
-        batch_iter = chainer.iterators.SerialIterator(np.arange(self.states.shape[0]-1), self.meta_batch_size)
+        mb_iter = chainer.iterators.SerialIterator(np.arange(self.states.shape[0]-1), self.meta_batch_size)
         for _ in range(self.innerepochs):
-            while batch_iter.epoch == 0:
-                inds = batch_iter.__next__()
+            while mb_iter.epoch == 0:
+                inds = mb_iter.__next__()
                 self.meta_batch_train(inds)
+
+    def meta_update(self):
+        before = deepcopy(self.v_meta)
+        self.meta_train()
         for params_before, params in zip(before.params(), self.v_meta.params()):
-            params.data = params_before.data + (params.data - params_before.data)
+            params.data = params_before.data + self.outerstepsize * (params.data - params_before.data)
 
     def reset_params(self):
         for params, params_meta in zip(self.model.v.params(), self.v_meta.params()):

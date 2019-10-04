@@ -41,9 +41,9 @@ class A2C_Vmeta(A2C):
         for params_cp, params in zip(model_cp.params(), self.v_meta.params()):
             params.data = params_cp.data + self.outerstepsize * (params.data - params_cp.data)
 
-    def reset_params(self):
-        for params, params_meta in zip(self.model.v.params(), self.v_meta.params()):
-            params.data = params_meta.data.copy()
+    def sync_params(self, model_base, model):
+        for params, params_base in zip(model.params(), model_base.params()):
+            params.data = params_base.data.copy()
 
 
     def update(self):
@@ -54,5 +54,5 @@ class A2C_Vmeta(A2C):
         self._compute_returns(next_value)
         self.meta_train()
         self.meta_phaze = False
-        self.reset_params()
+        self.sync_params(self.v_meta, self.model.v)
         self.update()

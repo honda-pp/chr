@@ -45,14 +45,13 @@ class A2C_Vmeta(A2C):
         for params, params_base in zip(model.params(), model_base.params()):
             params.data = params_base.data.copy()
 
-
     def update(self):
         self.meta_phaze = True
         with chainer.no_backprop_mode():
             _, next_value = self.model.pi_and_v(self.states[-1])
             next_value = next_value.array[:, 0]
         self._compute_returns(next_value)
-        self.meta_train()
+        self.meta_update()
         self.meta_phaze = False
         self.sync_params(self.v_meta, self.model.v)
-        self.update()
+        super().update()

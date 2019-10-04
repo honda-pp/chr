@@ -54,4 +54,4 @@ class A2C_Vmeta(A2C):
         self.meta_update()
         self.meta_phaze = False
         self.sync_params(self.v_meta, self.model.v)
-        self.update()
+        super().update()

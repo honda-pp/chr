@@ -6,7 +6,7 @@ def main():
     parser.add_argument("--innerstepsize", type=float, default=0.02)
     parser.add_argument("--innerepochs", type=int, default=1)
     parser.add_argument("--meta_batch_size", type=int, default=4)
-    parser.add_argument('--v_learn_epochs', action='store_false')
+    parser.add_argument('--v_learn_epochs', type=int, default=1)
     args = agp(parser)
     
     logging.basicConfig(level=args.logger_level)

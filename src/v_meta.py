@@ -30,12 +30,15 @@ class A2C_Vmeta(A2C):
         for params in model.params():
             params.data -= self.innerstepsize * params.grad
 
-    def meta_train(self, model):
-        mb_iter = chainer.iterators.SerialIterator(np.arange(self.states.shape[0]-1), self.meta_batch_size)
-        for _ in range(self.innerepochs):
-            while mb_iter.epoch == 0:
-                inds = self.xp.array(mb_iter.__next__())
-                self.meta_batch_train(inds, model)
+    def meta_train(self, model, batch=False):
+        if batch:
+            self.meta_batch_train(self.xp.arange(self.states.shape[0]-1), model)
+        else:
+            mb_iter = chainer.iterators.SerialIterator(np.arange(self.states.shape[0]-1), self.meta_batch_size)
+            for _ in range(self.innerepochs):
+                while mb_iter.epoch == 0:
+                    inds = self.xp.array(mb_iter.__next__())
+                    self.meta_batch_train(inds, model)
 
     def meta_update(self, model):
         model_cp = deepcopy(model)
@@ -58,5 +61,5 @@ class A2C_Vmeta(A2C):
         self.sync_params(self.v_meta, self.model.v)
         if self.v_learn_epochs > 1:
             for _ in range(self.v_learn_epochs-1):
-                self.meta_train(self.model.v)
+                self.meta_train(self.model.v, batch=True)
         super().update()

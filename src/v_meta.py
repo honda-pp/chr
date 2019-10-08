@@ -23,7 +23,7 @@ class A2C_Vmeta(A2C):
             pass
 
     def meta_batch_train(self, inds, model):
-        values = model(Variable(self.states[inds].reshape([-1] + list(self.obs_shape))))
+        values = model(Variable(self.states.reshape([-1] + list(self.obs_shape))[inds]))
         loss = F.mean((self.returns[inds] - values) ** 2)
         model.cleargrads()
         loss.backward()
@@ -34,7 +34,7 @@ class A2C_Vmeta(A2C):
         mb_iter = chainer.iterators.SerialIterator(np.arange(self.states.shape[0]-1), self.meta_batch_size)
         for _ in range(self.innerepochs):
             while mb_iter.epoch == 0:
-                inds = mb_iter.__next__()
+                inds = self.xp.array(mb_iter.__next__())
                 self.meta_batch_train(inds, model)
 
     def meta_update(self, model):

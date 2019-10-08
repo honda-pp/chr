@@ -13,10 +13,11 @@ class A2C_Vmeta(A2C):
         self.innerstepsize = innerstepsize
         self.innerepochs = innerepochs
         self.meta_batch_size = meta_batch_size
+        self.outerstepsize = outerstepsize
 
     def _compute_returns(self, *args, **kwargs):
         if self.meta_phaze:
-            super()._compute_returns(*ags, **kwargs)
+            super()._compute_returns(*args, **kwargs)
         else:
             pass
 
@@ -35,7 +36,7 @@ class A2C_Vmeta(A2C):
                 inds = mb_iter.__next__()
                 self.meta_batch_train(inds, model)
 
-    def meta_update(self, model=self.v_meta):
+    def meta_update(self, model):
         model_cp = deepcopy(model)
         self.meta_train(model_cp)
         for params_cp, params in zip(model_cp.params(), self.v_meta.params()):
@@ -51,7 +52,7 @@ class A2C_Vmeta(A2C):
             _, next_value = self.model.pi_and_v(self.states[-1])
             next_value = next_value.array[:, 0]
         self._compute_returns(next_value)
-        self.meta_update()
+        self.meta_update(self.v_meta)
         self.meta_phaze = False
         self.sync_params(self.v_meta, self.model.v)
         super().update()

@@ -7,13 +7,14 @@ import chainerrl
 from chainerrl.agents import A2C
 
 class A2C_Vmeta(A2C):
-    def __init__(self, outerstepsize=0.1, innerstepsize=0.02, innerepochs=1, meta_batch_size=4, *args, **kwargs):
+    def __init__(self, outerstepsize=0.1, innerstepsize=0.02, innerepochs=1, meta_batch_size=4, v_mb=True, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.v_meta = deepcopy(self.model.v)
         self.innerstepsize = innerstepsize
         self.innerepochs = innerepochs
         self.meta_batch_size = meta_batch_size
         self.outerstepsize = outerstepsize
+        self.v_mb = v_mb
 
     def _compute_returns(self, *args, **kwargs):
         if self.meta_phaze:
@@ -54,5 +55,9 @@ class A2C_Vmeta(A2C):
         self._compute_returns(next_value)
         self.meta_update(self.v_meta)
         self.meta_phaze = False
-        self.sync_params(self.v_meta, self.model.v)
+        if self.v_mb is None:
+            self.sync_params(self.v_meta, self.model.v)
         super().update()
+        if self.v_mb:
+            self.sync_params(self.v_meta, self.model.v)
+            self.meta_train(self.model.v)

@@ -126,4 +126,4 @@ class A2C_Vcheet(A2C):
     """
     def update(self):
         self.v_learn()
-        return self.update()
+        return super().update()

@@ -6,7 +6,7 @@ def main():
     parser.add_argument("--innerstepsize", type=float, default=0.02)
     parser.add_argument("--innerepochs", type=int, default=1)
     parser.add_argument("--meta_batch_size", type=int, default=4)
-    parser.add_argument('--v_mb', action='store_false')
+    parser.add_argument('--v_learn_epochs', action='store_false')
     args = agp(parser)
     
     logging.basicConfig(level=args.logger_level)
@@ -68,7 +68,7 @@ def main():
                     innerstepsize=args.innerstepsize,
                     innerepochs=args.innerepochs,
                     meta_batch_size=args.meta_batch_size,
-                    v_mb=args.v_mb)
+                    v_learn_epochs=args.v_learn_epochs)
     if args.load:
         agent.load(args.load)
 

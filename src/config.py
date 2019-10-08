@@ -30,9 +30,7 @@ class A2CFFSoftmax(chainer.ChainList, a2c.A2CModel):
     def pi_and_v(self, state):
         return self.pi(state), self.v(state)
 
-def agp():
-    
-    parser = argparse.ArgumentParser()
+def agp(parser=argparse.ArgumentParser()):    
     parser.add_argument('--env', type=str, default='CartPole-v0')
     parser.add_argument('--seed', type=int, default=0,
                         help='Random seed [0, 2 ** 32)')

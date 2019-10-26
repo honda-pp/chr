@@ -1,6 +1,5 @@
-import logging, time, statistics
+import logging, time
 import numpy as np
-import chainerrl
 from chainerrl.experiments import evaluator
 
 def batch_run_evaluation_episodes(
@@ -27,6 +26,7 @@ def batch_run_evaluation_episodes(
 
     obss = env.reset()
     rs = np.zeros(num_envs, dtype='f')
+    
 
     termination_conditions = False
     timestep = 0
@@ -118,3 +118,29 @@ def batch_run_evaluation_episodes(
     return [float(r) for r in eval_episode_returns]
 
 evaluator.batch_run_evaluation_episodes = batch_run_evaluation_episodes
+
+class Evaluator(evaluator.Evaluator):
+    def evaluate_and_update_max_score(self, t, episodes):
+        eval_stats = evaluator.eval_performance(
+            self.env, self.agent, self.n_steps, self.n_episodes,
+            max_episode_len=self.max_episode_len,
+            logger=self.logger)
+        elapsed = time.time() - self.start_time
+        custom_values = tuple(tup[1] for tup in self.agent.get_statistics())
+        mean = eval_stats['mean']
+        values = (t,
+                  episodes,
+                  elapsed,
+                  mean,
+                  eval_stats['median'],
+                  eval_stats['stdev'],
+                  eval_stats['max'],
+                  eval_stats['min']) + custom_values
+        evaluator.record_stats(self.outdir, values)
+        if mean > self.max_score:
+            self.logger.info('The best score is updated %s -> %s',
+                             self.max_score, mean)
+            self.max_score = mean
+            if self.save_best_so_far_agent:
+                evaluator.save_agent(self.agent, "best", self.outdir, self.logger)
+        return mean

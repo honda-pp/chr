@@ -2,7 +2,7 @@ from config import *
 from save_eval_data import *
 def main():
 
-    args = agp()
+    args = agp(eval_interval=50, steps=5*10**3)
     
     logging.basicConfig(level=args.logger_level)
 

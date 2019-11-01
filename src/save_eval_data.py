@@ -9,7 +9,22 @@ def batch_run_evaluation_episodes(
     n_episodes,
     max_episode_len=None,
     logger=None,
-    ):
+):
+    """Run multiple evaluation episodes and return returns in a batch manner.
+    Args:
+        env (VectorEnv): Environment used for evaluation.
+        agent (Agent): Agent to evaluate.
+        n_steps (int): Number of total timesteps to evaluate the agent.
+        n_episodes (int): Number of evaluation runs.
+        max_episode_len (int or None): If specified, episodes
+            longer than this value will be truncated.
+        logger (Logger or None): If specified, the given Logger
+            object will be used for logging results. If not
+            specified, the default logger of this module will
+            be used.
+    Returns:
+        List of returns of evaluation runs.
+    """
     assert (n_steps is None) != (n_episodes is None)
 
     logger = logger or logging.getLogger(__name__)
@@ -26,7 +41,6 @@ def batch_run_evaluation_episodes(
 
     obss = env.reset()
     rs = np.zeros(num_envs, dtype='f')
-    
 
     termination_conditions = False
     timestep = 0
@@ -118,6 +132,7 @@ def batch_run_evaluation_episodes(
     return [float(r) for r in eval_episode_returns]
 
 evaluator.batch_run_evaluation_episodes = batch_run_evaluation_episodes
+
 
 class Evaluator(evaluator.Evaluator):
     def evaluate_and_update_max_score(self, t, episodes):

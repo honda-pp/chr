@@ -32,7 +32,7 @@ class A2CFFSoftmax(chainer.ChainList, a2c.A2CModel):
 
 def agp(parser=argparse.ArgumentParser(), env='CartPole-v0', seed=0, outdir=None, profile='store_true', steps=2*10**5, 
         update_steps=5, log_interval=10**3, eval_interval=10**3, eval_n_runs=14, reward_scale_factor=1e-2, gamma=0.99, 
-        lr=7e-4, gpu=1,num_envs=8
+        lr=7e-4, gpu=0,num_envs=8
     ):    
     parser.add_argument('--env', type=str, default=env)
     parser.add_argument('--seed', type=int, default=seed,

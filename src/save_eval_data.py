@@ -2,6 +2,8 @@ import logging, time
 import numpy as np
 from chainerrl.experiments import evaluator
 
+outnum = 0
+
 def batch_run_evaluation_episodes(
     env,
     agent,
@@ -9,25 +11,11 @@ def batch_run_evaluation_episodes(
     n_episodes,
     max_episode_len=None,
     logger=None,
-):
-    """Run multiple evaluation episodes and return returns in a batch manner.
-    Args:
-        env (VectorEnv): Environment used for evaluation.
-        agent (Agent): Agent to evaluate.
-        n_steps (int): Number of total timesteps to evaluate the agent.
-        n_episodes (int): Number of evaluation runs.
-        max_episode_len (int or None): If specified, episodes
-            longer than this value will be truncated.
-        logger (Logger or None): If specified, the given Logger
-            object will be used for logging results. If not
-            specified, the default logger of this module will
-            be used.
-    Returns:
-        List of returns of evaluation runs.
-    """
+    ):
     assert (n_steps is None) != (n_episodes is None)
-
+    global outnum
     logger = logger or logging.getLogger(__name__)
+    outdir = logger.name
     num_envs = env.num_envs
     episode_returns = dict()
     episode_lengths = dict()
@@ -41,17 +29,24 @@ def batch_run_evaluation_episodes(
 
     obss = env.reset()
     rs = np.zeros(num_envs, dtype='f')
+    states_save = np.zeros([201, n_episodes, *obss[0].shape], dtype='f')
+    states_tmp = np.zeros([201, num_envs, *obss[0].shape], dtype='f')
+    states_tmp[0] = agent.batch_states(obss, np, agent.phi)
+    actions_save = np.zeros([200, n_episodes], dtype='i') - 100
+    actions_tmp = np.zeros([200, num_envs], dtype='i')
 
     termination_conditions = False
     timestep = 0
     while True:
         # a_t
         actions = agent.batch_act(obss)
+        actions_tmp[episode_len] = actions
         timestep += 1
         # o_{t+1}, r_{t+1}
         obss, rs, dones, infos = env.step(actions)
         episode_r += rs
         episode_len += 1
+        states_tmp[episode_len] = agent.batch_states(obss, np, agent.phi)
         # Compute mask for done and reset
         if max_episode_len is None:
             resets = np.zeros(num_envs, dtype=bool)
@@ -69,6 +64,9 @@ def batch_run_evaluation_episodes(
                 episode_returns[episode_indices[index]] = episode_r[index]
                 episode_lengths[episode_indices[index]] = episode_len[index]
                 # Give the new episode an a new episode index
+                if episode_indices[index] < 14:
+                    states_save[:,episode_indices[index]] = states_tmp[:,index]
+                    actions_save[:episode_len[index],episode_indices[index]] = actions_tmp[:episode_len[index], index]
                 episode_indices[index] = episode_idx
                 episode_idx += 1
 
@@ -79,7 +77,6 @@ def batch_run_evaluation_episodes(
         first_unfinished_episode = 0
         while first_unfinished_episode in episode_returns:
             first_unfinished_episode += 1
-
         # Check for termination conditions
         eval_episode_returns = []
         eval_episode_lens = []
@@ -129,33 +126,9 @@ def batch_run_evaluation_episodes(
             zip(eval_episode_lens, eval_episode_returns)):
         logger.info('evaluation episode %s length: %s R: %s',
                     i, epi_len, epi_ret)
+    np.save(outdir+"/state"+str(outnum)+".npy", states_save)
+    np.save(outdir+"/action"+str(outnum)+".npy", actions_save)
+    outnum += 1
     return [float(r) for r in eval_episode_returns]
 
 evaluator.batch_run_evaluation_episodes = batch_run_evaluation_episodes
-
-
-class Evaluator(evaluator.Evaluator):
-    def evaluate_and_update_max_score(self, t, episodes):
-        eval_stats = evaluator.eval_performance(
-            self.env, self.agent, self.n_steps, self.n_episodes,
-            max_episode_len=self.max_episode_len,
-            logger=self.logger)
-        elapsed = time.time() - self.start_time
-        custom_values = tuple(tup[1] for tup in self.agent.get_statistics())
-        mean = eval_stats['mean']
-        values = (t,
-                  episodes,
-                  elapsed,
-                  mean,
-                  eval_stats['median'],
-                  eval_stats['stdev'],
-                  eval_stats['max'],
-                  eval_stats['min']) + custom_values
-        evaluator.record_stats(self.outdir, values)
-        if mean > self.max_score:
-            self.logger.info('The best score is updated %s -> %s',
-                             self.max_score, mean)
-            self.max_score = mean
-            if self.save_best_so_far_agent:
-                evaluator.save_agent(self.agent, "best", self.outdir, self.logger)
-        return mean

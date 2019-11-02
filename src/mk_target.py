@@ -1,8 +1,9 @@
 from config import *
 from save_eval_data import *
+import os
 def main():
 
-    args = agp(eval_interval=50, steps=5*10**3)
+    args = agp(log_interval=100, eval_interval=100, steps=2*10**5, outdir="target")
     
     logging.basicConfig(level=args.logger_level)
 
@@ -12,8 +13,10 @@ def main():
     process_seeds = np.arange(args.num_envs) + args.seed * args.num_envs
     assert process_seeds.max() < 2 ** 32
 
-    logger = logging.getLogger(args.outdir)
     args.outdir = experiments.prepare_output_dir(args, args.outdir)
+    npydir = args.outdir+"/npy"
+    os.mkdir(npydir)
+    logger = logging.getLogger(npydir)
 
     def make_env(process_idx, test):
         env = gym.make(args.env)

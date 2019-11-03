@@ -1,13 +1,9 @@
 from config import *
-from v_meta import A2C_Vmeta
+from save_eval_data import *
+import os
 def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--outerstepsize", type=float, default=0.1)
-    parser.add_argument("--innerstepsize", type=float, default=0.02)
-    parser.add_argument("--innerepochs", type=int, default=1)
-    parser.add_argument("--meta_batch_size", type=int, default=4)
-    parser.add_argument('--v_learn_epochs', type=int, default=1)
-    args = agp(parser)
+
+    args = agp(log_interval=100, eval_interval=100, steps=2*10**5, outdir="target")
     
     logging.basicConfig(level=args.logger_level)
 
@@ -18,6 +14,9 @@ def main():
     assert process_seeds.max() < 2 ** 32
 
     args.outdir = experiments.prepare_output_dir(args, args.outdir)
+    npydir = args.outdir+"/npy"
+    os.mkdir(npydir)
+    logger = logging.getLogger(npydir)
 
     def make_env(process_idx, test):
         env = gym.make(args.env)
@@ -58,17 +57,12 @@ def main():
     if args.weight_decay > 0:
         optimizer.add_hook(NonbiasWeightDecay(args.weight_decay))
 
-    agent = A2C_Vmeta(model=model, optimizer=optimizer, gamma=args.gamma,
+    agent = a2c.A2C(model, optimizer, gamma=args.gamma,
                     gpu=args.gpu,
                     num_processes=args.num_envs,
                     update_steps=args.update_steps,
                     use_gae=args.use_gae,
-                    tau=args.tau,
-                    outerstepsize=args.outerstepsize,
-                    innerstepsize=args.innerstepsize,
-                    innerepochs=args.innerepochs,
-                    meta_batch_size=args.meta_batch_size,
-                    v_learn_epochs=args.v_learn_epochs)
+                    tau=args.tau)
     if args.load:
         agent.load(args.load)
 
@@ -94,6 +88,7 @@ def main():
             eval_n_episodes=args.eval_n_runs,
             eval_interval=args.eval_interval,
             outdir=args.outdir,
+            logger=logger
         )
 
 

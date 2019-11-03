@@ -58,5 +58,15 @@ class Meta_Opt(A2C_Vmeta):
         masks = np.ones([actions.shape[0], 1])
         masks[actions==-100] = 0
         rewards = masks.copy()
-        return states, actions, masks, rewards
+        for t, ac in enumerate(actions):
+            if -100 in ac:
+                if ac[ac!=-100].sum() != 0:
+                    pass
+                else:
+                    states = states[:t]
+                    masks = masks[:t]
+                    rewards = rewards[:t]
+                    break
+
+        return states, masks, rewards
         

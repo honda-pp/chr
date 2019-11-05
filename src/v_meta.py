@@ -24,6 +24,7 @@ class A2C_Vmeta(A2C):
 
     def meta_batch_train(self, inds, model):
         values = model(Variable(self.states.reshape([-1] + list(self.obs_shape))[inds]))
+        values = values.reshape((self.update_steps, self.num_processes))
         loss = F.mean((self.returns[inds] - values) ** 2)
         model.cleargrads()
         loss.backward()

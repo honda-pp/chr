@@ -9,7 +9,7 @@ from v_meta import A2C_Vmeta
 
 class Meta_Opt(A2C_Vmeta):
     def __init__(self, outerstepsize=0.1, innerstepsize=0.02, innerepochs=1, meta_batch_size=4, v_learn_epochs=1, 
-                ndim_obs=4, hidden_sizes=(64, 64), t_v_learn_epochs=30, gpu=0, gamma=0.9, f_num=2000, num_processes=4, update_step=5, 
+                ndim_obs=4, hidden_sizes=(64, 64), t_v_learn_epochs=30, gpu=0, gamma=0.9, f_num=2000, num_processes=14, update_step=5, 
                 use_gae=False, tau=0.95, batch_states=batch_states, *args, **kwargs):
         self.model = links.MLP(ndim_obs, 1, hidden_sizes=hidden_sizes)
         self.gpu = gpu
@@ -56,19 +56,23 @@ class Meta_Opt(A2C_Vmeta):
         t_inds = inds[:self.update_steps+1]
         if len(t_inds) != self.update_steps + 1:
             t_inds = np.append(t_inds, [t_inds[-1]+1])
-        self.states = states[t_inds]
+        if chainer.cuda.available and self.xp is chainer.cuda.cupy:
+            converter = chainer.cuda.to_gpu
+        else:
+            converter = lambda x: x
+        self.states = converter(states[t_inds])
         t_inds = inds[:self.update_steps]
-        self.masks = masks[t_inds]
-        self.rewards = rewards[t_inds]
+        self.masks = converter(masks[t_inds])
+        self.rewards = converter(rewards[t_inds])
 
     def gen_task(self, ind=None):
         if ind is None:
             ind = rnd.randint(0, self.f_num, 1).item()
         states = np.load(self.s_files[ind])
         actions = np.load(self.a_files[ind])
-        masks = np.ones([*actions.shape, 1])
+        masks = np.ones([*actions.shape])
         masks[0] = 0
-        rewards = np.ones([*actions.shape, 1])
+        rewards = np.ones([*actions.shape])
         t_last = masks.shape[0]
         terminal = np.zeros(actions.shape[1], dtype='i')
         for t, ac in enumerate(actions):
@@ -102,8 +106,9 @@ class Meta_Opt(A2C_Vmeta):
                 #t_inds = inds[i*self.update_steps:(i+1)*self.update_steps]
                 self.set_data(states, masks, rewards, inds[i*self.update_steps:])
                 next_values = self.model(Variable(self.states[-1].reshape([-1] + list(self.obs_shape))))
+                
                 self._compute_returns(next_values)
-                losses[i] = self.meta_train(self.model, batch=True)
+                losses[i] = self.meta_train(self.model, batch=True).item()
             print(e, losses)
         serializers.save_npz('t_models/v_t'+str(t)+'.npz', self.model)
 
@@ -125,3 +130,4 @@ if __name__=="__main__":
              t_v_learn_epochs=args.t_v_learn_epochs, gpu=args.gpu)
     meop._flush_storage([20,4])
     meop.learn_v_target(args.t)
+    

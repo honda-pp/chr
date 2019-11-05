@@ -2,7 +2,7 @@ from copy import deepcopy
 import numpy as np
 import numpy.random as rnd
 import chainer
-from chainer import serializers, Variable
+from chainer import serializers, Variable, functions as F
 from chainerrl.misc.batch_states import batch_states
 from chainerrl import links
 from v_meta import A2C_Vmeta
@@ -114,6 +114,7 @@ class Meta_Opt(A2C_Vmeta):
         wip
         """
         if self.use_gae:
+            raise NotImplementedError()
             self.value_preds[-1] = next_value
             self.set_value_preds(self)
             gae = 0
@@ -131,22 +132,33 @@ class Meta_Opt(A2C_Vmeta):
         """
         wip
         """
-        returns = np.zeros((t_last + 1, self.num_processes), dtype='f')
-        returns[-1] = model(Variable(
-                    self.converter(states[t_last].reshape([-1] + list(self.obs_shape)))
-                    )).array[:,0]
-        if self.use_gae:
-            gae = 0
-            for i in reversed(range(t_last)):
-                delta = rewards[i] + \
-                    self.gamma * self.value_preds[i + 1] * masks[i] - \
-                    self.value_preds[i]
-                gae = delta + self.gamma * self.tau * masks[i] * gae
-                returns[i] = gae + self.value_preds[i]
-        else:
-            for i in reversed(range(t_last)):
-                returns[i] = rewards[i] + \
-                    self.gamma * returns[i + 1] * masks[i]
+        with chainer.no_backprop_mode():
+            returns = np.zeros((t_last + 1, self.num_processes), dtype='f')
+            returns[-1] = model(Variable(
+                        self.converter(states[t_last].reshape([-1] + list(self.obs_shape)))
+                        )).array[:,0]
+            if self.use_gae:
+                """
+                wip
+                """
+                raise NotImplementedError()
+                gae = 0
+                for i in reversed(range(t_last)):
+                    delta = rewards[i] + \
+                        self.gamma * self.value_preds[i + 1] * masks[i] - \
+                        self.value_preds[i]
+                    gae = delta + self.gamma * self.tau * masks[i] * gae
+                    returns[i] = gae + self.value_preds[i]
+            else:
+                for i in reversed(range(t_last)):
+                    returns[i] = rewards[i] + \
+                        self.gamma * returns[i + 1] * masks[i]
+            values = self.model(Variable(
+                            self.converter(states[:t_last].reshape([-1] + list(self.obs_shape)))
+                            )).reshape(t_last, self.num_processes)                        
+            values = chainer.cuda.to_cpu(values.array)
+            error = F.mean((returns[:-1] - values) ** 2)
+            print('error', error.item())
         
 
 
@@ -161,11 +173,14 @@ class Meta_Opt(A2C_Vmeta):
             for i in range(0, t_last // self.update_steps):
                 #t_inds = inds[i*self.update_steps:(i+1)*self.update_steps]
                 self.set_data(states, masks, rewards, inds[i*self.update_steps:])
-                next_values = self.model(Variable(self.states[-1].reshape([-1] + list(self.obs_shape))))
-                
+                with chainer.no_backprop_mode():
+                    next_values = self.model(Variable(self.states[-1].reshape([-1] + list(self.obs_shape))))
                 self._compute_returns(next_values.array[:,0])
                 losses[i] = self.meta_train(self.model, batch=True).item()
-            print(e, losses)
+            print(e, end=' ')
+            for loss in losses:
+                print(loss, end=' ')
+            self.v_pef_check(self.model, states, masks, rewards, t_last)
         serializers.save_npz(self.outdir+str(t)+'.npz', self.model)
 
 

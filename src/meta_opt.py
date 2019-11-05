@@ -107,7 +107,7 @@ class Meta_Opt(A2C_Vmeta):
                 self.set_data(states, masks, rewards, inds[i*self.update_steps:])
                 next_values = self.model(Variable(self.states[-1].reshape([-1] + list(self.obs_shape))))
                 
-                self._compute_returns(next_values)
+                self._compute_returns(next_values.array[:,0])
                 losses[i] = self.meta_train(self.model, batch=True).item()
             print(e, losses)
         serializers.save_npz('t_models/v_t'+str(t)+'.npz', self.model)

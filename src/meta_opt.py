@@ -10,7 +10,7 @@ from v_meta import A2C_Vmeta
 class Meta_Opt(A2C_Vmeta):
     def __init__(self, outerstepsize=0.1, innerstepsize=0.02, innerepochs=1, meta_batch_size=4, v_learn_epochs=1, 
                 ndim_obs=4, hidden_sizes=(64, 64), t_v_learn_epochs=30, gpu=0, gamma=0.9, f_num=2000, num_processes=4, update_step=5, 
-                use_gue=False, tau=0.95, batch_states=batch_states, *args, **kwargs):
+                use_gae=False, tau=0.95, batch_states=batch_states, *args, **kwargs):
         self.model = links.MLP(ndim_obs, 1, hidden_sizes=hidden_sizes)
         self.gpu = gpu
         if gpu is not None and gpu >= 0:
@@ -25,7 +25,7 @@ class Meta_Opt(A2C_Vmeta):
         self.num_processes = num_processes
         self.gamma = gamma
         self.update_steps = update_step
-        self.use_gue = use_gue
+        self.use_gae = use_gae
         self.tau = tau
         self.xp = self.model.xp
         self.phi = lambda x: x

@@ -104,4 +104,22 @@ class Meta_Opt(A2C_Vmeta):
                 self._compute_returns(next_values)
                 losses[i] = self.meta_train(self.model, batch=True)
             print(e, losses)
-        serializers.save_npz('v_t'+str(t)+'.npz', self.model)
+        serializers.save_npz('t_models/v_t'+str(t)+'.npz', self.model)
+
+
+if __name__=="__main__":
+    import argparse
+    from config import agp
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--outerstepsize", type=float, default=0.1)
+    parser.add_argument("--innerstepsize", type=float, default=0.02)
+    parser.add_argument("--innerepochs", type=int, default=1)
+    parser.add_argument("--meta_batch_size", type=int, default=4)
+    parser.add_argument('--v_learn_epochs', type=int, default=1)
+    parser.add_argument('--t_v_learn_epochs', type=int, default=20)
+    parser.add_argument('--t', type=int, default=0)
+    args = agp(parser)
+
+    meop = Meta_Opt(outerstepsize=args.outerstepsize, innerepochs=args.innerepochs, innerstepsize=args.innerstepsize, 
+             t_v_learn_epochs=args.t_v_learn_epochs, gpu=args.gpu)
+    meop.learn_v_target(args.t)

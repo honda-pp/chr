@@ -122,5 +122,5 @@ if __name__=="__main__":
 
     meop = Meta_Opt(outerstepsize=args.outerstepsize, innerepochs=args.innerepochs, innerstepsize=args.innerstepsize, 
              t_v_learn_epochs=args.t_v_learn_epochs, gpu=args.gpu)
-    meop._flush_storage(4)
+    meop._flush_storage([20,4])
     meop.learn_v_target(args.t)

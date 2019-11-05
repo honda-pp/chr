@@ -140,7 +140,7 @@ class Meta_Opt(A2C_Vmeta):
             next_value = model(Variable(
                         self.converter(states[t_last].reshape([-1] + list(self.obs_shape)))
                         ))
-            next_value = chainer.cuda.to_cpu(next_value).array[:,0]
+            next_value = chainer.cuda.to_cpu(next_value.array[:,0])
             returns[-1] = next_value
             if self.use_gae:
                 """

@@ -16,6 +16,9 @@ class Meta_Opt(A2C_Vmeta):
         if gpu is not None and gpu >= 0:
             chainer.cuda.get_device_from_id(gpu).use()
             self.model.to_gpu(device=gpu)
+            self.converter = chainer.cuda.to_gpu
+        else:
+            self.converter = lambda x: x
         self.meta = deepcopy(self.model)
         self.innerstepsize = innerstepsize
         self.innerepochs = innerepochs
@@ -56,14 +59,10 @@ class Meta_Opt(A2C_Vmeta):
         t_inds = inds[:self.update_steps+1]
         if len(t_inds) != self.update_steps + 1:
             t_inds = np.append(t_inds, [t_inds[-1]+1])
-        if chainer.cuda.available and self.xp is chainer.cuda.cupy:
-            converter = chainer.cuda.to_gpu
-        else:
-            converter = lambda x: x
-        self.states = converter(states[t_inds])
+        self.states = self.converter(states[t_inds])
         t_inds = inds[:self.update_steps]
-        self.masks = converter(masks[t_inds])
-        self.rewards = converter(rewards[t_inds])
+        self.masks = self.converter(masks[t_inds])
+        self.rewards = self.converter(rewards[t_inds])
 
     def gen_task(self, ind=None):
         if ind is None:
@@ -92,10 +91,12 @@ class Meta_Opt(A2C_Vmeta):
                     t_last = t
                     break
         t_start = rnd.randint(0, t_last - self.update_steps, 1).item()
-        return states, masks, rewards, t_start, t_last
-        
+        return states, masks, rewards, t_start, t_last, ind
+
+
+
     def learn_v_target(self, t):
-        states, masks, rewards, _, t_last = self.gen_task(t)
+        states, masks, rewards, _, t_last, _ = self.gen_task(t)
         self.meta_phaze = True
         for e in range(self.t_v_learn_epochs):
             phaze = rnd.randint(0, t_last, 1).item()

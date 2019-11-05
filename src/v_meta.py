@@ -33,7 +33,10 @@ class A2C_Vmeta(A2C):
 
     def meta_train(self, model, batch=True):
         if batch:
-            return self.meta_batch_train(self.xp.arange(self.states.shape[0]-1), model)
+            loss = 0
+            for _ in range(self.innerepochs):
+                loss += self.meta_batch_train(self.xp.arange(self.states.shape[0]-1), model)
+            return loss / self.innerepochs
         else:
             mb_iter = chainer.iterators.SerialIterator(np.arange(self.states.shape[0]-1), self.meta_batch_size)
             loss = 0

@@ -15,7 +15,7 @@ class Meta_Opt(A2C_Vmeta):
         self.gpu = gpu
         if gpu is not None and gpu >= 0:
             chainer.cuda.get_device_from_id(gpu).use()
-            self
+            self.model.to_gpu(device=gpu)
         self.meta = deepcopy(self.model)
         self.innerstepsize = innerstepsize
         self.innerepochs = innerepochs

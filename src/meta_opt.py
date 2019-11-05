@@ -137,9 +137,11 @@ class Meta_Opt(A2C_Vmeta):
         """
         with chainer.no_backprop_mode():
             returns = np.zeros((t_last + 1, self.num_processes), dtype='f')
-            returns[-1] = model(Variable(
+            next_value = model(Variable(
                         self.converter(states[t_last].reshape([-1] + list(self.obs_shape)))
-                        )).array[:,0]
+                        ))
+            next_value = chainer.cuda.to_cpu(next).array[:,0]
+            returns[-1] = next_value
             if self.use_gae:
                 """
                 wip

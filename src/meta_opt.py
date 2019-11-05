@@ -92,6 +92,7 @@ class Meta_Opt(A2C_Vmeta):
         
     def learn_v_target(self, t):
         states, masks, rewards, _, t_last = self.gen_task(t)
+        self.meta_phaze = True
         for e in range(self.t_v_learn_epochs):
             phaze = rnd.randint(0, t_last, 1).item()
             inds = np.arange(0, t_last) + phaze

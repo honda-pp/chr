@@ -124,7 +124,7 @@ class Meta_Opt(A2C_Vmeta):
                 gae = delta + self.gamma * self.tau * self.masks[i] * gae
                 self.returns[i] = gae + self.value_preds[i]
         else:
-            super()._compute_returns(self, next_value)
+            super()._compute_returns(next_value)
     
 
     def v_pef_check(self, model, states, masks, rewards, t_last):

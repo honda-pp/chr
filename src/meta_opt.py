@@ -1,3 +1,4 @@
+import os
 from copy import deepcopy
 import numpy as np
 import numpy.random as rnd
@@ -10,7 +11,7 @@ from v_meta import A2C_Vmeta
 class Meta_Opt(A2C_Vmeta):
     def __init__(self, outerstepsize=0.1, innerstepsize=0.02, innerepochs=1, meta_batch_size=4, v_learn_epochs=1, 
                 ndim_obs=4, hidden_sizes=(64, 64), t_v_learn_epochs=30, gpu=0, gamma=0.9, f_num=2000, num_processes=14, update_step=5, 
-                use_gae=False, tau=0.95, batch_states=batch_states, outdir="t_models/v_t", *args, **kwargs):
+                use_gae=False, tau=0.95, batch_states=batch_states, outdir="t_models", *args, **kwargs):
         self.model = links.MLP(ndim_obs, 1, hidden_sizes=hidden_sizes)
         self.gpu = gpu
         if gpu is not None and gpu >= 0:
@@ -37,6 +38,8 @@ class Meta_Opt(A2C_Vmeta):
         self.f_num = f_num
         self.a_files = ["npy/action"+str(i)+".npy" for i in range(f_num)]
         self.s_files = ["npy/state"+str(i)+".npy" for i in range(f_num)]
+        if not os.path.exists(outdir):
+            os.mkdir(outdir)
         self.outdir = outdir
 
 
@@ -181,7 +184,7 @@ class Meta_Opt(A2C_Vmeta):
             for loss in losses:
                 print(loss, end=' ')
             self.v_pef_check(self.model, states, masks, rewards, t_last)
-        serializers.save_npz(self.outdir+str(t)+'.npz', self.model)
+        serializers.save_npz(self.outdir+"/v_t"+str(t)+'.npz', self.model)
 
 
 if __name__=="__main__":
@@ -195,7 +198,7 @@ if __name__=="__main__":
     parser.add_argument('--v_learn_epochs', type=int, default=1)
     parser.add_argument('--t_v_learn_epochs', type=int, default=20)
     parser.add_argument('--t', type=int, default=0)
-    args = agp(parser)
+    args = agp(parser, outdir='t_ms')
 
     meop = Meta_Opt(outerstepsize=args.outerstepsize, innerepochs=args.innerepochs, innerstepsize=args.innerstepsize, 
              t_v_learn_epochs=args.t_v_learn_epochs, gpu=args.gpu, outdir=args.outdir)

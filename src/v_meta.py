@@ -29,16 +29,21 @@ class A2C_Vmeta(A2C):
         loss.backward()
         for params in model.params():
             params.data -= self.innerstepsize * params.grad
+        return loss.to_cpu()
 
-    def meta_train(self, model, batch=False):
+    def meta_train(self, model, batch=True):
         if batch:
-            self.meta_batch_train(self.xp.arange(self.states.shape[0]-1), model)
+            return self.meta_batch_train(self.xp.arange(self.states.shape[0]-1), model)
         else:
             mb_iter = chainer.iterators.SerialIterator(np.arange(self.states.shape[0]-1), self.meta_batch_size)
+            loss = 0
+            n = 0
             for _ in range(self.innerepochs):
                 while mb_iter.epoch == 0:
                     inds = self.xp.array(mb_iter.__next__())
-                    self.meta_batch_train(inds, model)
+                    loss += self.meta_batch_train(inds, model)
+                    n +- 1
+            return loss / n
 
     def meta_update(self, model):
         model_cp = deepcopy(model)

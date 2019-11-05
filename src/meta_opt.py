@@ -10,7 +10,7 @@ from v_meta import A2C_Vmeta
 class Meta_Opt(A2C_Vmeta):
     def __init__(self, outerstepsize=0.1, innerstepsize=0.02, innerepochs=1, meta_batch_size=4, v_learn_epochs=1, 
                 ndim_obs=4, hidden_sizes=(64, 64), t_v_learn_epochs=30, gpu=0, gamma=0.9, f_num=2000, num_processes=14, update_step=5, 
-                use_gae=False, tau=0.95, batch_states=batch_states, *args, **kwargs):
+                use_gae=False, tau=0.95, batch_states=batch_states, outdir="t_models/v_t", *args, **kwargs):
         self.model = links.MLP(ndim_obs, 1, hidden_sizes=hidden_sizes)
         self.gpu = gpu
         if gpu is not None and gpu >= 0:
@@ -37,6 +37,8 @@ class Meta_Opt(A2C_Vmeta):
         self.f_num = f_num
         self.a_files = ["npy/action"+str(i)+".npy" for i in range(f_num)]
         self.s_files = ["npy/state"+str(i)+".npy" for i in range(f_num)]
+        self.outdir = outdir
+
 
     def _flush_storage(self, obs_shape):
         obs_shape = obs_shape[1:]
@@ -70,7 +72,7 @@ class Meta_Opt(A2C_Vmeta):
         states = np.load(self.s_files[ind])
         actions = np.load(self.a_files[ind])
         masks = np.ones([*actions.shape])
-        masks[0] = 0
+        masks[-1] = 0
         rewards = np.ones([*actions.shape])
         t_last = masks.shape[0]
         terminal = np.zeros(actions.shape[1], dtype='i')
@@ -93,6 +95,59 @@ class Meta_Opt(A2C_Vmeta):
         t_start = rnd.randint(0, t_last - self.update_steps, 1).item()
         return states, masks, rewards, t_start, t_last, ind
 
+    def meta_update(self, model):
+        """
+        wip
+        """
+        states, masks, rewards, t_start, t_last, ind = self.gen_task()
+        self.set_data(states, masks, rewards, np.arange(t_start,self.update_steps+1))
+        super().meta_update(model)
+    
+    def set_value_preds(self):
+        """
+        wip
+        """
+        pass
+
+    def _compute_returns(self, next_value):
+        """
+        wip
+        """
+        if self.use_gae:
+            self.value_preds[-1] = next_value
+            self.set_value_preds(self)
+            gae = 0
+            for i in reversed(range(self.update_steps)):
+                delta = self.rewards[i] + \
+                    self.gamma * self.value_preds[i + 1] * self.masks[i] - \
+                    self.value_preds[i]
+                gae = delta + self.gamma * self.tau * self.masks[i] * gae
+                self.returns[i] = gae + self.value_preds[i]
+        else:
+            super()._compute_returns(self, next_value)
+    
+
+    def v_pef_check(self, model, states, masks, rewards, t_last):
+        """
+        wip
+        """
+        returns = np.zeros((t_last + 1, self.num_processes), dtype='f')
+        returns[-1] = model(Variable(
+                    self.converter(states[t_last].reshape([-1] + list(self.obs_shape)))
+                    )).array[:,0]
+        if self.use_gae:
+            gae = 0
+            for i in reversed(range(t_last)):
+                delta = rewards[i] + \
+                    self.gamma * self.value_preds[i + 1] * masks[i] - \
+                    self.value_preds[i]
+                gae = delta + self.gamma * self.tau * masks[i] * gae
+                returns[i] = gae + self.value_preds[i]
+        else:
+            for i in reversed(range(t_last)):
+                returns[i] = rewards[i] + \
+                    self.gamma * returns[i + 1] * masks[i]
+        
 
 
     def learn_v_target(self, t):
@@ -111,7 +166,7 @@ class Meta_Opt(A2C_Vmeta):
                 self._compute_returns(next_values.array[:,0])
                 losses[i] = self.meta_train(self.model, batch=True).item()
             print(e, losses)
-        serializers.save_npz('t_models/v_t'+str(t)+'.npz', self.model)
+        serializers.save_npz(self.outdir+str(t)+'.npz', self.model)
 
 
 if __name__=="__main__":
@@ -128,7 +183,7 @@ if __name__=="__main__":
     args = agp(parser)
 
     meop = Meta_Opt(outerstepsize=args.outerstepsize, innerepochs=args.innerepochs, innerstepsize=args.innerstepsize, 
-             t_v_learn_epochs=args.t_v_learn_epochs, gpu=args.gpu)
+             t_v_learn_epochs=args.t_v_learn_epochs, gpu=args.gpu, outdir=args.outdir)
     meop._flush_storage([20,4])
     meop.learn_v_target(args.t)
     

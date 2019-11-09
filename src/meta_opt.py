@@ -234,8 +234,8 @@ if __name__=="__main__":
     parser.add_argument('--t_v_learn_epochs', type=int, default=20)
     parser.add_argument('--epochs', type=int, default=4000)
     parser.add_argument('--t', type=int, default=0)
+    parser.add_argument('--name', type=str, default="vmeta")
     args = agp(parser, outdir='pre-meta')
-    args = agp(parser, name='vmeta')
 
     meop = Meta_Opt(outerstepsize=args.outerstepsize, innerepochs=args.innerepochs, innerstepsize=args.innerstepsize, 
              t_v_learn_epochs=args.t_v_learn_epochs, gpu=args.gpu, outdir=args.outdir, epochs=args.epochs)

@@ -102,9 +102,15 @@ class Meta_Opt(A2C_Vmeta):
         """
         wip
         """
-        states, masks, rewards, t_start, t_last, ind = self.gen_task()
-        self.set_data(states, masks, rewards, np.arange(t_start,self.update_steps+1))
-        super().meta_update(model)
+        states, masks, rewards, t_start, _, ind = self.gen_task()
+        inds = np.arange(self.update_steps+1) + t_start
+        self.set_data(states, masks, rewards, inds)
+        next_value = model(Variable(
+                    self.converter(self.states[-1].reshape([-1] + list(self.obs_shape)))
+                    ))
+        next_value = chainer.cuda.to_cpu(next_value.array[:,0])
+        self._compute_returns(next_value)
+        return super().meta_update(model)
     
     def set_value_preds(self):
         """
@@ -113,11 +119,9 @@ class Meta_Opt(A2C_Vmeta):
         pass
 
     def _compute_returns(self, next_value):
-        """
-        wip
-        """
         if self.use_gae:
-            raise NotImplementedError()
+            """
+            wip
             self.value_preds[-1] = next_value
             self.set_value_preds(self)
             gae = 0
@@ -127,6 +131,8 @@ class Meta_Opt(A2C_Vmeta):
                     self.value_preds[i]
                 gae = delta + self.gamma * self.tau * self.masks[i] * gae
                 self.returns[i] = gae + self.value_preds[i]
+            """
+            raise NotImplementedError()
         else:
             super()._compute_returns(next_value)
     

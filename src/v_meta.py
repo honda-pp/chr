@@ -7,7 +7,7 @@ import chainerrl
 from chainerrl.agents import A2C
 
 class A2C_Vmeta(A2C):
-    def __init__(self, outerstepsize=0.1, innerstepsize=0.02, innerepochs=1, meta_batch_size=4, v_learn_epochs=1, *args, **kwargs):
+    def __init__(self, outerstepsize=0.1, innerstepsize=0.02, innerepochs=1, meta_batch_size=4, v_learn_epochs=4, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.v_meta = deepcopy(self.model.v)
         self.innerstepsize = innerstepsize
@@ -51,9 +51,10 @@ class A2C_Vmeta(A2C):
 
     def meta_update(self, model):
         model_cp = deepcopy(model)
-        self.meta_train(model_cp)
+        loss = self.meta_train(model_cp)
         for params_cp, params in zip(model_cp.params(), self.v_meta.params()):
             params.data = params_cp.data + self.outerstepsize * (params.data - params_cp.data)
+        return loss
 
     def sync_params(self, model_base, model):
         for params, params_base in zip(model.params(), model_base.params()):
@@ -70,5 +71,5 @@ class A2C_Vmeta(A2C):
         self.sync_params(self.v_meta, self.model.v)
         if self.v_learn_epochs > 1:
             for _ in range(self.v_learn_epochs-1):
-                self.meta_train(self.model.v, batch=True)
+                self.meta_batch_train(self.xp.arange(self.states.shape[0]-1), self.model.v)
         super().update()

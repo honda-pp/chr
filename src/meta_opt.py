@@ -10,7 +10,7 @@ from v_meta import A2C_Vmeta
 
 class Meta_Opt(A2C_Vmeta):
     def __init__(self, outerstepsize=0.1, innerstepsize=0.02, innerepochs=1, meta_batch_size=4, v_learn_epochs=4, epochs=4000, check_interval=40,
-                ndim_obs=4, hidden_sizes=(64, 64), t_v_learn_epochs=30, gpu=0, gamma=0.9, f_num=2000, num_processes=14, update_step=5, 
+                ndim_obs=4, hidden_sizes=(64, 64), t_v_learn_epochs=30, gpu=0, gamma=0.9, f_num=1000, num_processes=14, update_step=5, 
                 use_gae=False, tau=0.95, batch_states=batch_states, outdir="t_models", *args, **kwargs):
         self.model = links.MLP(ndim_obs, 1, hidden_sizes=hidden_sizes)
         self.gpu = gpu
@@ -43,6 +43,7 @@ class Meta_Opt(A2C_Vmeta):
         if not os.path.exists(outdir):
             os.mkdir(outdir)
         self.outdir = outdir
+        self.meta_phaze = True
 
 
     def _flush_storage(self, obs_shape):
@@ -105,13 +106,14 @@ class Meta_Opt(A2C_Vmeta):
         wip
         """
         states, masks, rewards, t_start, _, ind = self.gen_task()
-        inds = np.arange(self.update_steps+1) + t_start
+        inds = np.arange(self.update_steps + 1) + t_start
         self.set_data(states, masks, rewards, inds)
         with chainer.no_backprop_mode():
             next_value = model(Variable(
                     self.converter(self.states[-1].reshape([-1] + list(self.obs_shape)))
                     ))
-        next_value = chainer.cuda.to_cpu(next_value.array[:,0])
+        next_value = next_value.array[:,0]
+        #next_value = chainer.cuda.to_cpu(next_value.array[:,0])
         self._compute_returns(next_value)
         return super().meta_update(model), ind
 
@@ -122,13 +124,14 @@ class Meta_Opt(A2C_Vmeta):
             if (e + 1) % self.check_interval == 0:
                 states, masks, rewards, t_start, t_last, _ = self.gen_task(ind)
                 self.sync_params(self.model, self.meta)
-                inds = np.arange(self.update_steps+1) + t_start
+                inds = np.arange(self.update_steps) + t_start
                 self.set_data(states, masks, rewards, inds)
                 with chainer.no_backprop_mode():
-                    next_value = model(Variable(
+                    next_value = self.model(Variable(
                             self.converter(self.states[-1].reshape([-1] + list(self.obs_shape)))
                             ))
-                next_value = chainer.cuda.to_cpu(next_value.array[:,0])
+                next_value = next_value.array[:,0]
+                #next_value = chainer.cuda.to_cpu(next_value.array[:,0])
                 self._compute_returns(next_value)
                 for _ in range(self.v_learn_epochs):
                     self.meta_batch_train(inds, self.meta)

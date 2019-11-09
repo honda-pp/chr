@@ -1,8 +1,8 @@
 #!/bin/bash
 env0="CartPole-v0"
 mx=20
-vepochs=4
-innerepochs=4
+vepochs=64
+innerepochs=16
 name="c/meta-vepoch"${vepochs}"-inepochs"${innerepochs}
 N=4
 for ((s=0;s<$N;s+=1));do

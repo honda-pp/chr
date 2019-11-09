@@ -9,7 +9,7 @@ from chainerrl import links
 from v_meta import A2C_Vmeta
 
 class Meta_Opt(A2C_Vmeta):
-    def __init__(self, outerstepsize=0.1, innerstepsize=0.02, innerepochs=1, meta_batch_size=4, v_learn_epochs=1, 
+    def __init__(self, outerstepsize=0.1, innerstepsize=0.02, innerepochs=1, meta_batch_size=4, v_learn_epochs=4, epochs=4000, check_interval=40,
                 ndim_obs=4, hidden_sizes=(64, 64), t_v_learn_epochs=30, gpu=0, gamma=0.9, f_num=2000, num_processes=14, update_step=5, 
                 use_gae=False, tau=0.95, batch_states=batch_states, outdir="t_models", *args, **kwargs):
         self.model = links.MLP(ndim_obs, 1, hidden_sizes=hidden_sizes)
@@ -26,6 +26,8 @@ class Meta_Opt(A2C_Vmeta):
         self.meta_batch_size = meta_batch_size
         self.outerstepsize = outerstepsize
         self.v_learn_epochs = v_learn_epochs
+        self.epochs = epochs
+        self.check_interval = check_interval
         self.num_processes = num_processes
         self.gamma = gamma
         self.update_steps = update_step
@@ -105,12 +107,37 @@ class Meta_Opt(A2C_Vmeta):
         states, masks, rewards, t_start, _, ind = self.gen_task()
         inds = np.arange(self.update_steps+1) + t_start
         self.set_data(states, masks, rewards, inds)
-        next_value = model(Variable(
+        with chainer.no_backprop_mode():
+            next_value = model(Variable(
                     self.converter(self.states[-1].reshape([-1] + list(self.obs_shape)))
                     ))
         next_value = chainer.cuda.to_cpu(next_value.array[:,0])
         self._compute_returns(next_value)
-        return super().meta_update(model)
+        return super().meta_update(model), ind
+
+    def pre_train(self, name="vmeta"):
+        for e in range(self.epochs):
+            loss, ind = self.meta_update(self.model)
+            print(e, ind, loss.item(), end=' ')
+            if (e + 1) % self.check_interval == 0:
+                states, masks, rewards, t_start, t_last, _ = self.gen_task(ind)
+                self.sync_params(self.model, self.meta)
+                inds = np.arange(self.update_steps+1) + t_start
+                self.set_data(states, masks, rewards, inds)
+                with chainer.no_backprop_mode():
+                    next_value = model(Variable(
+                            self.converter(self.states[-1].reshape([-1] + list(self.obs_shape)))
+                            ))
+                next_value = chainer.cuda.to_cpu(next_value.array[:,0])
+                self._compute_returns(next_value)
+                for _ in range(self.v_learn_epochs):
+                    self.meta_batch_train(inds, self.meta)
+                self.v_pef_check(self.meta, states, masks, rewards, t_last)
+            else:
+                print()
+        serializers.save_npz(self.outdir+"/"+name+".npz", self.model)
+
+
     
     def set_value_preds(self):
         """
@@ -206,10 +233,12 @@ if __name__=="__main__":
     parser.add_argument('--v_learn_epochs', type=int, default=1)
     parser.add_argument('--t_v_learn_epochs', type=int, default=20)
     parser.add_argument('--t', type=int, default=0)
-    args = agp(parser, outdir='t_ms')
+    args = agp(parser, outdir='pre-meta')
+    args = agp(parser, name='vmeta')
 
     meop = Meta_Opt(outerstepsize=args.outerstepsize, innerepochs=args.innerepochs, innerstepsize=args.innerstepsize, 
              t_v_learn_epochs=args.t_v_learn_epochs, gpu=args.gpu, outdir=args.outdir)
     meop._flush_storage([20,4])
-    meop.learn_v_target(args.t)
+    #meop.learn_v_target(args.t)
+    meop.pre_train(args.name)
     

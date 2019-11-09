@@ -52,7 +52,7 @@ class A2C_Vmeta(A2C):
     def meta_update(self, model):
         model_cp = deepcopy(model)
         loss = self.meta_train(model_cp)
-        for params_cp, params in zip(model_cp.params(), self.v_meta.params()):
+        for params_cp, params in zip(model_cp.params(), model.params()):
             params.data = params_cp.data + self.outerstepsize * (params.data - params_cp.data)
         return loss
 

@@ -18,7 +18,7 @@ def batch_run_evaluation_episodes(
     global outnum
     logger = logger or logging.getLogger(__name__)
     outdir = logger.name
-    serializers.save_npz(outdir+'modle'+str(outdir), agent.model)
+    serializers.save_npz(outdir+'/model'+str(outnum), agent.model)
     outnum += 1    
     return evaluator.batch_run_evaluation_episodes
 

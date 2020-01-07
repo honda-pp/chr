@@ -24,3 +24,4 @@ def batch_run_evaluation_episodes(
     return evaluator.batch_run_evaluation_episodes(env, agent, n_steps, n_episodes, max_episode_len=max_episode_len, logger=logger)
 
 
+evaluator.batch_run_evaluation_episodes = batch_run_evaluation_episodes

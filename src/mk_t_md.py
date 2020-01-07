@@ -1,7 +1,7 @@
 from save_models import *
 
 def main():
-    evaluator.batch_run_evaluation_episodes = batch_run_evaluation_episodes    
+        
     args = agp(log_interval=100, eval_interval=100, steps=2*10**5, outdir="target")
     
     logging.basicConfig(level=args.logger_level)

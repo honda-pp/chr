@@ -3,7 +3,7 @@ from config import *
 def mk_dt(agent, env, steps, outdir, number):
     num_envs = env.num_envs
     obss = env.reset()
-    rewards = np.zeros([step, num_envs], dtype='f')
+    rewards = np.zeros([steps, num_envs], dtype='f')
     states = np.zeros([steps+1, num_envs, *obss[0].shape], dtype='f')
     masks = np.ones([steps+1, num_envs, *obss[0].shape], dtype='f')
     masks[0] *= 0
@@ -30,7 +30,7 @@ def mk_dt(agent, env, steps, outdir, number):
     
 def main():
         
-    args = agp(log_interval=100, eval_interval=100, steps=2*10**5, outdir="target")
+    args = agp(log_interval=100, eval_interval=100, steps=200, outdir="target")
     
     logging.basicConfig(level=args.logger_level)
 

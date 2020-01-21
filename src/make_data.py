@@ -22,7 +22,7 @@ def mk_dt(agent, env, steps, outdir, number):
         obss = env.reset(not_end)
         states[t+1] = agent.batch_states(obss, np, agent.phi)
         masks[t+1] = not_end
-        print(not_end,rs)
+        
     np.save(outdir+"/state"+number+".npy", states)
     np.save(outdir+"/action"+number+".npy", actions)
     np.save(outdir+"/mask"+number+".npy", masks)

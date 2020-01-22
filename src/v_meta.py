@@ -10,6 +10,9 @@ class A2C_Vmeta(A2C):
     def __init__(self, outerstepsize=0.1, innerstepsize=0.02, innerepochs=1, meta_batch_size=4, v_learn_epochs=4, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.v_meta = deepcopy(self.model.v)
+        if gpu is not None and gpu >= 0:
+            chainer.cuda.get_device_from_id(gpu).use()
+            self.v_meta.to_gpu(device=gpu)
         self.innerstepsize = innerstepsize
         self.innerepochs = innerepochs
         self.meta_batch_size = meta_batch_size

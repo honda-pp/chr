@@ -28,11 +28,11 @@ class off_learn(A2C_Vmeta):
     def set_data(self, data_ind, t_ind):
         all_states = np.load(self.base_path+"state"+str(data_ind)+".npy")
         all_rewards = np.load(self.base_path+"reward"+str(data_ind)+".npy")
-        all_masks = np.load(self.base_path+"mask"+str(data_ind)+".npy")
+        all_masks = np.load(self.base_path+"mask"+str(data_ind)+".npy")[1:]
         all_actions = np.load(self.base_path+"action"+str(data_ind)+".npy")
         self.states[:] = self.converter(all_states[t_ind:t_ind+self.update_steps+1])
         self.rewards[:] = all_rewards[t_ind:t_ind+self.update_steps]
-        self.masks[:] = all_masks[t_ind:t_ind+self.update_steps+1]
+        self.masks[:] = all_masks[t_ind:t_ind+self.update_steps]
         self.actions[:] = all_actions[t_ind:t_ind+self.update_steps]
     def gen_task(self):
         data_ind = np.random.randint(0, self.max_ind)
@@ -50,8 +50,8 @@ class off_learn(A2C_Vmeta):
         return loss / self.v_learn_epochs
     def __call__(self):
         data_ind = 0
-        states = self.batch_states(np.load(self.base_path+"state"+str(data_ind)+".npy")[:self.update_steps+1], self.xp, self.phi)
-        actions = np.load(self.base_path+"reward"+str(data_ind)+".npy")[:self.update_steps]
+        states = self.batch_states(np.load(self.base_path+"state"+str(data_ind)+".npy")[0], self.xp, self.phi)
+        actions = np.load(self.base_path+"reward"+str(data_ind)+".npy")[0]
         self._flush_storage(states.shape, actions)
         for e in range(self.epochs):
             self.gen_task()

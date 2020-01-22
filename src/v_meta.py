@@ -7,7 +7,7 @@ import chainerrl
 from chainerrl.agents import A2C
 
 class A2C_Vmeta(A2C):
-    def __init__(self, outerstepsize=0.1, innerstepsize=0.02, innerepochs=1, meta_batch_size=4, v_learn_epochs=4, *args, **kwargs):
+    def __init__(self, outerstepsize=0.1, innerstepsize=0.02, innerepochs=1, meta_batch_size=4, v_learn_epochs=4, gpu=0, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.v_meta = deepcopy(self.model.v)
         if gpu is not None and gpu >= 0:

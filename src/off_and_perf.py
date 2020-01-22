@@ -1,6 +1,6 @@
 from off_learn import off_learn, A2C_not_learn
 from config import *
-
+import os
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--outerstepsize", type=float, default=0.1)
@@ -69,8 +69,8 @@ def main():
                     innerepochs=args.innerepochs,
                     meta_batch_size=args.meta_batch_size,
                     v_learn_epochs=args.v_learn_epochs)
-    if args.load:
-        pre_train.load(args.load)
+    if os.path.exists(pre_train.outdir+"/"+pre_train.name+".npz"):
+        pre_train.load(pre_train.outdir+"/"+pre_train.name+".npz")
     else:
         pre_train()
 

@@ -32,9 +32,9 @@ class off_learn(A2C_Vmeta):
         all_masks = np.load(self.base_path+"mask"+str(data_ind)+".npy")[1:]
         all_actions = np.load(self.base_path+"action"+str(data_ind)+".npy")
         self.states[:] = self.converter(all_states[t_ind:t_ind+self.update_steps+1])
-        self.rewards[:] = all_rewards[t_ind:t_ind+self.update_steps]
-        self.masks[:] = all_masks[t_ind:t_ind+self.update_steps]
-        self.actions[:] = all_actions[t_ind:t_ind+self.update_steps]
+        self.rewards[:] = self.converter(all_rewards[t_ind:t_ind+self.update_steps])
+        self.masks[:] = self.converter(all_masks[t_ind:t_ind+self.update_steps])
+        #self.actions[:] = all_actions[t_ind:t_ind+self.update_steps]
     def gen_task(self):
         data_ind = np.random.randint(0, self.max_ind)
         t_ind = np.random.randint(0, 195)

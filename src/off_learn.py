@@ -60,6 +60,8 @@ class off_learn(A2C_Vmeta):
             print(e, loss)
         self.sync_params(self.v_meta, self.model.v)
         serializers.save_npz(self.outdir+"/"+self.name+".npz", self.model)
+    def load(self, path):
+        serializers.load_npz(path, self.model)
 
 
 

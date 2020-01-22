@@ -58,10 +58,7 @@ def main():
     optimizer.add_hook(chainer.optimizer.GradientClipping(args.max_grad_norm))
     if args.weight_decay > 0:
         optimizer.add_hook(NonbiasWeightDecay(args.weight_decay))
-    if args.load:
-        model.load(args.load)
-    else:
-        pre_train = off_learn(model=model, optimizer=optimizer, gamma=args.gamma,
+    pre_train = off_learn(model=model, optimizer=optimizer, gamma=args.gamma,
                     gpu=args.gpu,
                     num_processes=args.num_envs,
                     update_steps=args.update_steps,
@@ -72,6 +69,9 @@ def main():
                     innerepochs=args.innerepochs,
                     meta_batch_size=args.meta_batch_size,
                     v_learn_epochs=args.v_learn_epochs)
+    if args.load:
+        pre_train.load(args.load)
+    else:
         pre_train()
 
     agent = A2C_not_learn(model=model, optimizer=optimizer, gamma=args.gamma,

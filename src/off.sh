@@ -18,7 +18,7 @@ for ve in "${ve_list[@]}";do
                 for ((s=0;s<$N;s+=1));do
                     for ((i=$s;i<$mx;i+=N));do
                         echo ${i}${name}
-                        python3 -u off_and_perf.py --outdir $name --env $env --gpu $(($i%2)) --seed $i --v_learn_epochs $v_learn_epochs --innerepochs $innerepochs --innerstepsize $innerstepsize --outerstepsize outerstepsize >> ${name}.out;
+                        python3 -u off_and_perf.py --outdir $name --env $env --gpu $(($i%2)) --seed $i --v_learn_epochs $v_learn_epochs --innerepochs $innerepochs --innerstepsize $innerstepsize --outerstepsize $outerstepsize >> ${name}.out;
                     done&
                 done;
             done;

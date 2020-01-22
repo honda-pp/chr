@@ -111,7 +111,7 @@ class A2C_Vmeta(A2C):
             (float(action_loss.array) - self.average_actor_loss))
         self.average_value += (
             (1 - self.average_value_decay) *
-            (float(value_loss.array) - self.average_value))
+            (float(value_loss) - self.average_value))
         self.average_entropy += (
             (1 - self.average_entropy_decay) *
             (float(dist_entropy.array) - self.average_entropy))

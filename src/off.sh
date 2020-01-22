@@ -1,7 +1,7 @@
 #!/bin/bash
 env="CartPole-v0"
 mx=20
-N=1
+N=4
 ve_list=(1 4 8 16)
 is_list=(0.01 0.05 0.1 0.5)
 ie_list=(1 4 8 16)
@@ -21,8 +21,9 @@ for ve in "${ve_list[@]}";do
                         python3 -u off_and_perf.py --outdir $name --env $env --gpu $(($i%2)) --seed $i --v_learn_epochs $v_learn_epochs --innerepochs $innerepochs --innerstepsize $innerstepsize --outerstepsize $outerstepsize >> ${name}.out;
                         sleep 5;
                     done&
-                    sleep 5;
+                    sleep 60;
                 done;
+                sleep 240;
             done;
         done;
     done;

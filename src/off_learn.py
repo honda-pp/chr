@@ -24,6 +24,7 @@ class off_learn(A2C_Vmeta):
             os.mkdir(outdir)
         self.outdir = outdir
         self.name = "i-e" + str(self.innerepochs) + "i-s" + str(self.innerstepsize) + "o-s" + str(self.outerstepsize) + "v-e" + str(self.v_learn_epochs)
+        self.xp = self.model.xp
         
     def set_data(self, data_ind, t_ind):
         all_states = np.load(self.base_path+"state"+str(data_ind)+".npy")

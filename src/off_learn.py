@@ -72,5 +72,5 @@ class A2C_not_learn(A2C_Vmeta):
         if model_path is not None:
             serializers.load_npz(model_path, self.model)
         
-    def meta_update(self):
+    def meta_update(self, *args, **kwargs):
         pass

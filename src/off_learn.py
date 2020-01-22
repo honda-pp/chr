@@ -49,6 +49,10 @@ class off_learn(A2C_Vmeta):
             loss = self.meta_batch_train(self.xp.arange(self.states.shape[0]-1), self.model.v)
         return loss / self.v_learn_epochs
     def __call__(self):
+        data_ind = 0
+        states = self.batch_states(np.load(self.base_path+"state"+str(data_ind)+".npy")[:self.update_steps+1], self.xp, self.phi)
+        actions = np.load(self.base_path+"reward"+str(data_ind)+".npy")[:self.update_steps]
+        self._flush_storage(states.shape, actions)
         for e in range(self.epochs):
             self.gen_task()
             loss = self.update()

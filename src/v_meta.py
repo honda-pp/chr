@@ -31,7 +31,7 @@ class A2C_Vmeta(A2C):
         loss.backward()
         for params in model.params():
             params.data -= self.innerstepsize * params.grad
-        return loss
+        return loss.data
 
     def meta_train(self, model, batch=True):
         if batch:

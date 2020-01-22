@@ -71,8 +71,9 @@ class A2C_Vmeta(A2C):
         #self.meta_phaze = False
         self.sync_params(self.v_meta, self.model.v)
         value_loss = 0
-        for _ in range(self.v_learn_epochs-1):
+        for _ in range(self.v_learn_epochs):
             value_loss += self.meta_batch_train(self.xp.arange(self.states.shape[0]-1), self.model.v)
+        value_loss /= self.v_learn_epochs
         
         #super().update()
         pout, values = \

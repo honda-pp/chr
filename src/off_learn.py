@@ -23,7 +23,7 @@ class off_learn(A2C_Vmeta):
         if not os.path.exists(outdir):
             os.mkdir(outdir)
         self.outdir = outdir
-        self.name = "i-e" + str(self.innerepochs) + "i-s" + str(self.innerstepsize) + "o-s" + str(self.outerstepsize) + "v-e" + self.v_learn_epochs
+        self.name = "i-e" + str(self.innerepochs) + "i-s" + str(self.innerstepsize) + "o-s" + str(self.outerstepsize) + "v-e" + str(self.v_learn_epochs)
         
     def set_data(self, data_ind, t_ind):
         all_states = np.load(self.base_path+"state"+str(data_ind)+".npy")

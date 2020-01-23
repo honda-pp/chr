@@ -8,6 +8,8 @@ def main():
     parser.add_argument("--innerepochs", type=int, default=1)
     parser.add_argument("--meta_batch_size", type=int, default=4)
     parser.add_argument('--v_learn_epochs', type=int, default=1)
+    parser.add_argument('--md_outdir', type=str, default="trained")
+    parser.add_argument('--base_path', type=str, default="dt")
     args = agp(parser, outdir="tr")
     
     logging.basicConfig(level=args.logger_level)
@@ -68,7 +70,9 @@ def main():
                     innerstepsize=args.innerstepsize,
                     innerepochs=args.innerepochs,
                     meta_batch_size=args.meta_batch_size,
-                    v_learn_epochs=args.v_learn_epochs)
+                    v_learn_epochs=args.v_learn_epochs,
+                    outdir=args.md_outdir,
+                    base_path=args.base_path)
     if os.path.exists(pre_train.outdir+"/"+pre_train.name+".npz"):
         pre_train.load(pre_train.outdir+"/"+pre_train.name+".npz")
     else:

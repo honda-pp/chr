@@ -10,7 +10,7 @@ import os
 
 class off_learn(A2C_Vmeta):
     def __init__(self, epochs=20000, outdir="trained", base_path="dt/", gpu=0, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super().__init__(gpu=gpu, *args, **kwargs)
         self.max_ind = 1000
         if base_path[-1] != "/":
             base_path += "/"

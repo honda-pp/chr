@@ -68,8 +68,7 @@ def main():
                     innerstepsize=args.innerstepsize,
                     innerepochs=args.innerepochs,
                     meta_batch_size=args.meta_batch_size,
-                    v_learn_epochs=args.v_learn_epochs,
-                    outdir=args.env[0]+"tr")
+                    v_learn_epochs=args.v_learn_epochs)
     if os.path.exists(pre_train.outdir+"/"+pre_train.name+".npz"):
         pre_train.load(pre_train.outdir+"/"+pre_train.name+".npz")
     else:

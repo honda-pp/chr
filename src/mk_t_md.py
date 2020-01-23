@@ -13,7 +13,7 @@ def main():
     assert process_seeds.max() < 2 ** 32
 
     args.outdir = experiments.prepare_output_dir(args, args.outdir)
-    modeldir = args.outdir + "/models"
+    modeldir = args.env[0] + args.outdir + "/models"
     os.mkdir(modeldir)
     logger = logging.getLogger(modeldir)
 

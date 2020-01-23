@@ -9,9 +9,11 @@ from v_meta import A2C_Vmeta
 import os
 
 class off_learn(A2C_Vmeta):
-    def __init__(self, epochs=20000, outdir="trained/", base_path="dt/", gpu=0, *args, **kwargs):
+    def __init__(self, epochs=20000, outdir="trained", base_path="dt/", gpu=0, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.max_ind = 1000
+        if base_path[-1] != "/":
+            base_path += "/"
         self.base_path = base_path
         self.epochs = epochs
         if gpu is not None and gpu >= 0:

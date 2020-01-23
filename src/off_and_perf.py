@@ -1,5 +1,6 @@
 from off_learn import off_learn, A2C_not_learn
 from config import *
+from function import seed_used
 import os
 def main():
     parser = argparse.ArgumentParser()
@@ -11,6 +12,8 @@ def main():
     parser.add_argument('--md_outdir', type=str, default="trained")
     parser.add_argument('--base_path', type=str, default="dt")
     args = agp(parser, outdir="tr")
+    if seed_used(args.seed, args.outdir):
+        return 0
     
     logging.basicConfig(level=args.logger_level)
 

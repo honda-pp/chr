@@ -2,7 +2,7 @@
 #env="CartPole-v0"
 env="Acrobot-v1"
 mx=2000
-name="data"
+name="Adata"
 N=8
 for ((s=0;s<$N;s+=1));do
     for ((i=$s;i<$mx;i+=$N));do

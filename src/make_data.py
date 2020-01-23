@@ -32,7 +32,7 @@ def mk_dt(agent, env, steps, outdir, number):
     
 def main():
         
-    args = agp(log_interval=100, eval_interval=100, steps=200, outdir="target")
+    args = agp(log_interval=100, eval_interval=100, steps=200, outdir="data")
     
     logging.basicConfig(level=args.logger_level)
 
@@ -90,7 +90,7 @@ def main():
                     use_gae=args.use_gae,
                     tau=args.tau)
     if args.load:
-        agent.load("models/model"+args.load)
+        agent.load(args.env[0]+"models/model"+args.load)
 
     mk_dt(
         agent=agent,

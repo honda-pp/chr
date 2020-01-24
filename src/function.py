@@ -47,10 +47,12 @@ def del_missed_dir(folders):
     for fol in folders:
         fls = glob.glob(fol+"/*")
         for fs in fls:
-            if not os.path.exists(fs+"/best"):            
+            if not os.path.exists(fs+"/best"):   
+                print(fs)         
                 shutil.rmtree(fs)
         try:
             os.rmdir(fol)
+            print(fol)
         except OSError:
             pass
 

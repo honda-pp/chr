@@ -6,7 +6,7 @@ ve_list=(1 4 8 16)
 is_list=(0.01 0.05 0.1 0.5)
 ie_list=(1 4 8 16)
 os_list=(0.01 0.05 0.1 0.5)
-count=0
+count=1
 for ve in "${ve_list[@]}";do
     v_learn_epochs=$ve
     for ie in "${ie_list[@]}";do

@@ -1,25 +1,25 @@
---v_learn_epochs 1 --innerepochs 1 --outerstepsize 0.01 --innerstepsize 0.05
---v_learn_epochs 1 --innerepochs 1 --outerstepsize 0.01 --innerstepsize 0.1
---v_learn_epochs 1 --innerepochs 1 --outerstepsize 0.05 --innerstepsize 0.05
---v_learn_epochs 1 --innerepochs 1 --outerstepsize 0.05 --innerstepsize 0.1
---v_learn_epochs 1 --innerepochs 1 --outerstepsize 0.1 --innerstepsize 0.05
---v_learn_epochs 1 --innerepochs 1 --outerstepsize 0.1 --innerstepsize 0.1
---v_learn_epochs 1 --innerepochs 4 --outerstepsize 0.01 --innerstepsize 0.01
---v_learn_epochs 1 --innerepochs 4 --outerstepsize 0.01 --innerstepsize 0.05
---v_learn_epochs 1 --innerepochs 4 --outerstepsize 0.01 --innerstepsize 0.1
---v_learn_epochs 1 --innerepochs 4 --outerstepsize 0.05 --innerstepsize 0.01
---v_learn_epochs 1 --innerepochs 4 --outerstepsize 0.05 --innerstepsize 0.05
---v_learn_epochs 1 --innerepochs 4 --outerstepsize 0.05 --innerstepsize 0.1
---v_learn_epochs 1 --innerepochs 4 --outerstepsize 0.1 --innerstepsize 0.05
---v_learn_epochs 1 --innerepochs 4 --outerstepsize 0.1 --innerstepsize 0.1
---v_learn_epochs 1 --innerepochs 4 --outerstepsize 0.5 --innerstepsize 0.05
---v_learn_epochs 1 --innerepochs 4 --outerstepsize 0.5 --innerstepsize 0.1
---v_learn_epochs 8 --innerepochs 1 --outerstepsize 0.01 --innerstepsize 0.05
---v_learn_epochs 8 --innerepochs 1 --outerstepsize 0.01 --innerstepsize 0.1
---v_learn_epochs 8 --innerepochs 1 --outerstepsize 0.05 --innerstepsize 0.05
---v_learn_epochs 8 --innerepochs 1 --outerstepsize 0.05 --innerstepsize 0.1
---v_learn_epochs 8 --innerepochs 1 --outerstepsize 0.1 --innerstepsize 0.05
---v_learn_epochs 8 --innerepochs 1 --outerstepsize 0.1 --innerstepsize 0.1
---v_learn_epochs 8 --innerepochs 4 --outerstepsize 0.01 --innerstepsize 0.01
---v_learn_epochs 8 --innerepochs 4 --outerstepsize 0.01 --innerstepsize 0.05
---v_learn_epochs 8 --innerepochs 4 --outerstepsize 0.05 --innerstepsize 0.01
+--v_learn_epochs 1 --innerepochs 1 --outerstepsize 0.01 --innerstepsize 0.05 --outdir Cperf/off-ve1-ie1-os0.01-is0.05
+--v_learn_epochs 1 --innerepochs 1 --outerstepsize 0.01 --innerstepsize 0.1 --outdir Cperf/off-ve1-ie1-os0.01-is0.1
+--v_learn_epochs 1 --innerepochs 1 --outerstepsize 0.05 --innerstepsize 0.05 --outdir Cperf/off-ve1-ie1-os0.05-is0.05
+--v_learn_epochs 1 --innerepochs 1 --outerstepsize 0.05 --innerstepsize 0.1 --outdir Cperf/off-ve1-ie1-os0.05-is0.1
+--v_learn_epochs 1 --innerepochs 1 --outerstepsize 0.1 --innerstepsize 0.05 --outdir Cperf/off-ve1-ie1-os0.1-is0.05
+--v_learn_epochs 1 --innerepochs 1 --outerstepsize 0.1 --innerstepsize 0.1 --outdir Cperf/off-ve1-ie1-os0.1-is0.1
+--v_learn_epochs 1 --innerepochs 4 --outerstepsize 0.01 --innerstepsize 0.01 --outdir Cperf/off-ve1-ie4-os0.01-is0.01
+--v_learn_epochs 1 --innerepochs 4 --outerstepsize 0.01 --innerstepsize 0.05 --outdir Cperf/off-ve1-ie4-os0.01-is0.05
+--v_learn_epochs 1 --innerepochs 4 --outerstepsize 0.01 --innerstepsize 0.1 --outdir Cperf/off-ve1-ie4-os0.01-is0.1
+--v_learn_epochs 1 --innerepochs 4 --outerstepsize 0.05 --innerstepsize 0.01 --outdir Cperf/off-ve1-ie4-os0.05-is0.01
+--v_learn_epochs 1 --innerepochs 4 --outerstepsize 0.05 --innerstepsize 0.05 --outdir Cperf/off-ve1-ie4-os0.05-is0.05
+--v_learn_epochs 1 --innerepochs 4 --outerstepsize 0.05 --innerstepsize 0.1 --outdir Cperf/off-ve1-ie4-os0.05-is0.1
+--v_learn_epochs 1 --innerepochs 4 --outerstepsize 0.1 --innerstepsize 0.05 --outdir Cperf/off-ve1-ie4-os0.1-is0.05
+--v_learn_epochs 1 --innerepochs 4 --outerstepsize 0.1 --innerstepsize 0.1 --outdir Cperf/off-ve1-ie4-os0.1-is0.1
+--v_learn_epochs 1 --innerepochs 4 --outerstepsize 0.5 --innerstepsize 0.05 --outdir Cperf/off-ve1-ie4-os0.5-is0.05
+--v_learn_epochs 1 --innerepochs 4 --outerstepsize 0.5 --innerstepsize 0.1 --outdir Cperf/off-ve1-ie4-os0.5-is0.1
+--v_learn_epochs 8 --innerepochs 1 --outerstepsize 0.01 --innerstepsize 0.05 --outdir Cperf/off-ve8-ie1-os0.01-is0.05
+--v_learn_epochs 8 --innerepochs 1 --outerstepsize 0.01 --innerstepsize 0.1 --outdir Cperf/off-ve8-ie1-os0.01-is0.1
+--v_learn_epochs 8 --innerepochs 1 --outerstepsize 0.05 --innerstepsize 0.05 --outdir Cperf/off-ve8-ie1-os0.05-is0.05
+--v_learn_epochs 8 --innerepochs 1 --outerstepsize 0.05 --innerstepsize 0.1 --outdir Cperf/off-ve8-ie1-os0.05-is0.1
+--v_learn_epochs 8 --innerepochs 1 --outerstepsize 0.1 --innerstepsize 0.05 --outdir Cperf/off-ve8-ie1-os0.1-is0.05
+--v_learn_epochs 8 --innerepochs 1 --outerstepsize 0.1 --innerstepsize 0.1 --outdir Cperf/off-ve8-ie1-os0.1-is0.1
+--v_learn_epochs 8 --innerepochs 4 --outerstepsize 0.01 --innerstepsize 0.01 --outdir Cperf/off-ve8-ie4-os0.01-is0.01
+--v_learn_epochs 8 --innerepochs 4 --outerstepsize 0.01 --innerstepsize 0.05 --outdir Cperf/off-ve8-ie4-os0.01-is0.05
+--v_learn_epochs 8 --innerepochs 4 --outerstepsize 0.05 --innerstepsize 0.01 --outdir Cperf/off-ve8-ie4-os0.05-is0.01

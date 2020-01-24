@@ -10,13 +10,13 @@ def seed_used(seed, path):
                     if seed == json.loads(f.read())["seed"]:
                         return os.path.exists(file+"best")
 
-def comp(means, stds):
+def _comp(means, stds):
     mean = means.mean(0)
     N = 14
     std = np.sqrt(((N - 1) * (np.power(stds, 2).sum(0)) + N * np.power(means - mean, 2).sum(0)) / (N * stds.shape[0] - 1))
     return mean, std
 
-def comp_perf(folders):
+def comp_perf(folders, xlabel="steps (×10^3)", conv_name=lambda x: x):
     for folder in folders:
         files = glob.glob(folder+"/*/sco*")
         num = len(files)
@@ -26,21 +26,16 @@ def comp_perf(folders):
             with open(file, 'r') as f:
                 f.readline()
                 lines = f.readlines()
-                length = len(lines)
             for i, line in enumerate(lines):
                 means[j,i], stds[j,i] = map(float, line.split("\t")[3:6:2])
 
-        mean, std = comp(means, stds)
+        mean, std = _comp(means, stds)
         label = folder[2:]
-        """
-        label = re.sub("norm", "A2C", label)
-        label = re.sub("cheet", "reference", label)
-        label = re.sub("meta.*", "A2C (meta)", label)
-        """
+        label = conv_name(label)
         plt.plot(range(200), mean, label=label)
         plt.fill_between(range(200), mean-std, mean+std, alpha=0.3)
     plt.ylabel("reward")
-    plt.xlabel("steps (×10^3)")
+    plt.xlabel(xlabel)
     plt.legend(loc='lower right')
 
 def del_missed_dir(folders):

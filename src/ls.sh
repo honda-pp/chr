@@ -12,4 +12,4 @@ for ((s=0;s<$N;s+=1));do
             echo $l |xargs python3 -u off_and_perf.py --outdir Cperf --md_outdir "Ctrained" --base_path "cdt" --env $env --seed $i --gpu 1 #$(($i%2))
         done;
     done&
-done
+done;
